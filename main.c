@@ -322,7 +322,7 @@ static struct fuse_operations operations =
     .listxattr = do_listxattr,
     .getxattr = do_getxattr,
     .read = do_read,
-    
+    .unlink = do_unlink
 };
 
 int main(int argc, char *argv[])
