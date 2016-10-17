@@ -16,8 +16,7 @@ void create_container()
 {
     FILE *file_container = fopen(CONTAINER_NAME, "w+");
     int len = (FILE_SIZE) / (BLOCK_SIZE);
-    for (int i = 1; i <= len; i++)
-    {
+    for (int i = 1; i <= len; i++) {
         struct info block;
         block.size = 0;
         block.next_block = sizeof(struct info) * i;
