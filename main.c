@@ -50,10 +50,8 @@ struct path_info* find_path_info(const char *path)
     FILE *file = fopen(PATH_CONTAINER_NAME, "r+");
     fseek(file, sizeof(int), SEEK_SET);
     struct path_info *pi = (struct path_info*) malloc(sizeof(struct path_info));
-    while (fread(pi, sizeof(struct path_info), 1, file) != 0)
-    {
-        if (strcmp(pi->path, path) == 0)
-        {
+    while (fread(pi, sizeof(struct path_info), 1, file) != 0) {
+        if (strcmp(pi->path, path) == 0) {
             fclose(file);
             return pi;
         }
@@ -68,10 +66,8 @@ void rewrite_path_record(const char *path, struct path_info x)
     fseek(file, sizeof(int), SEEK_SET);
     int cur = sizeof(int);
     struct path_info pi;
-    while (fread(&pi, sizeof(struct path_info), 1, file) != 0)
-    {
-        if (strcmp(path, pi.path) == 0)
-        {
+    while (fread(&pi, sizeof(struct path_info), 1, file) != 0) {
+        if (strcmp(path, pi.path) == 0) {
             fseek(file, cur, SEEK_SET);
             fwrite(&x, sizeof(struct path_info), 1, file);
             fflush(file);
@@ -94,8 +90,7 @@ static int do_read( const char *path, char *buffer, size_t size, off_t offset, s
     size_t global_size = 0;
     if (offset > 0)
         global_size = offset;
-    while (global_size != pi->size && cur_size != size)
-    {
+    while (global_size != pi->size && cur_size != size) {
         fseek(file_container, pi->cur_block, SEEK_SET);
         fread(&block, sizeof(struct info), 1, file_container);
 
@@ -117,12 +112,10 @@ int write_buf(int begin, const char *buf, size_t size)
     struct info block;
     fseek(file_container, begin, SEEK_SET);
     int written_bytes = 0;
-    while (written_bytes != size)
-    {
+    while (written_bytes != size) {
         fread(&block, sizeof(struct info), 1, file_container);
         int count = MIN(size - written_bytes, BLOCK_SIZE - block.size);
         memcpy(block.data, buf + written_bytes, count);
-//        strncpy(block.data, buf, count);
         written_bytes += count;
         block.size = count;
         fseek(file_container, begin, SEEK_SET);
@@ -144,9 +137,7 @@ static int do_write(const char *path, const char *buf, size_t size, off_t offset
 {
     struct path_info *pi = find_path_info(path);
     int block_for_write;
-    if (pi)
-    {
-
+    if (pi) {
         block_for_write = write_buf(pi->end_block, buf, size);
 
         struct path_info new_pi;
@@ -166,19 +157,20 @@ static int do_write(const char *path, const char *buf, size_t size, off_t offset
 }
 
 static int do_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-    off_t offset, struct fuse_file_info *fi) {
-  (void) offset;
-  (void) fi;
-  filler(buf, ".", NULL, 0);
-  filler(buf, "..", NULL, 0);
+    off_t offset, struct fuse_file_info *fi) 
+{
+	(void) offset;
+	(void) fi;
+	filler(buf, ".", NULL, 0);
+	filler(buf, "..", NULL, 0);
 
-  FILE *file_path_container = fopen(PATH_CONTAINER_NAME, "r+");
-  fseek(file_path_container, sizeof(int), SEEK_SET);
-  struct path_info pi;
-  while (fread(&pi, sizeof(struct path_info), 1, file_path_container) != 0)
-      filler(buf, pi.path + 1, NULL, 0);
-  fclose(file_path_container);
-  return 0;
+	FILE *file_path_container = fopen(PATH_CONTAINER_NAME, "r+");
+	fseek(file_path_container, sizeof(int), SEEK_SET);
+	struct path_info pi;
+	while (fread(&pi, sizeof(struct path_info), 1, file_path_container) != 0)
+		filler(buf, pi.path + 1, NULL, 0);
+	fclose(file_path_container);
+	return 0;
 }
 
 static int do_getattr(const char *path, struct stat *stbuf) {
@@ -189,8 +181,7 @@ static int do_getattr(const char *path, struct stat *stbuf) {
         return 0;
     }
     struct path_info *pi = find_path_info(path);
-    if (pi)
-    {
+    if (pi) {
         stbuf->st_mode = S_IFREG | 0777;
         stbuf->st_nlink = 1;
         stbuf->st_size = pi->size;
@@ -252,8 +243,7 @@ void remove_path(const char *path)
     struct path_info pi_array[size - 1];
     struct path_info pi;
     int i = 0;
-    while (fread(&pi, sizeof(struct path_info), 1, file) != 0)
-    {
+    while (fread(&pi, sizeof(struct path_info), 1, file) != 0) {
         if (strcmp(pi.path, path) != 0)
             pi_array[i] = pi;
     }
