@@ -270,13 +270,7 @@ void remove_path(const char *path)
         if (strcmp(pi.path, path) != 0)
             pi_array[i] = pi;
     }
-    fseek(file, 0, SEEK_SET);
-    fclose(file);
-    file = fopen(PATH_CONTAINER_NAME, "w+");
-    fwrite(&begin, sizeof(int), 1, file);
-    for (int i = 0; i < size - 1; i++)
-        fwrite(&pi_array[i], sizeof(struct path_info), 1, file);
-    fclose(file);
+   
 }
 
 static int do_unlink(const char *path)
