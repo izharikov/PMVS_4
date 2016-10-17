@@ -99,19 +99,6 @@ static int do_read( const char *path, char *buffer, size_t size, off_t offset, s
         fseek(file_container, pi->cur_block, SEEK_SET);
         fread(&block, sizeof(struct info), 1, file_container);
 
-//        char *pointer = &block.data[pi->offset];
-//        if (cur_size + block.size > size)
-//        {
-//            strncat(data, pointer, size - cur_size);
-//            pi->offset = size - cur_size;
-//            if (pi->offset == 0 && pi->cur_block == pi->end_block)
-//                pi->cur_block = pi->first_block;
-//            rewrite_path_record(path, *pi);
-//            strcpy(buffer, data);
-//            fclose(file_container);
-//            return size;
-//        }
-
         memcpy(buffer + cur_size, block.data, block.size);
         cur_size += block.size - pi->offset;
         global_size += block.size - pi->offset;
