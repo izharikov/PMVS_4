@@ -93,11 +93,10 @@ static int do_read( const char *path, char *buffer, size_t size, off_t offset, s
     while (global_size != pi->size && cur_size != size) {
         fseek(file_container, pi->cur_block, SEEK_SET);
         fread(&block, sizeof(struct info), 1, file_container);
-
+	
         memcpy(buffer + cur_size, block.data, block.size);
         cur_size += block.size - pi->offset;
         global_size += block.size - pi->offset;
-        pi->cur_block = block.next_block;
     }
     if (offset + size >= pi->size)
         pi->cur_block = pi->first_block;
@@ -120,6 +119,7 @@ int write_buf(int begin, const char *buf, size_t size)
         block.size = count;
         fseek(file_container, begin, SEEK_SET);
         fwrite(&block, sizeof(struct info), 1, file_container);
+	fflush(file_container);
         begin = block.next_block;
     }
     fclose(file_container);
@@ -130,6 +130,7 @@ void update_first_empty_block(int new_block)
 {
     FILE *file = fopen(PATH_CONTAINER_NAME, "r+");
     fwrite(&new_block, sizeof(int), 1, file);
+    fflush(file);
     fclose(file);
 }
 
